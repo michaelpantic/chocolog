@@ -1,0 +1,7 @@
+bq24072 - see ti reference design
+ - max Vout 3.7v / min Vout >3.4v
+ - Use low dropout regulator for 3.3.v (that also supports up to 5v)
+ - Use boost converter for 5V
+
+
+

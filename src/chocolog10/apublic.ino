@@ -151,7 +151,6 @@ void convertToChar(char* buffer, byte numDigits, long number, long maxExpected)
 void convertFloatToChar(char *res, byte numDigits, float n, byte afterpoint)
 {
    
-   
     //if number is negative, decrease number of total digits by one
     //and if possible after point digits as well
     //write -

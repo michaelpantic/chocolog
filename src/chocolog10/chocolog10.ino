@@ -37,8 +37,6 @@ void startup_error(const __FlashStringHelper* message)
   
    char* pageBuffer = pub_getEmptyPage(0);  
    strcpy_P(pageBuffer, (const char*)message);
-
- 
    Serial.print(message);
 
    ui_outputLoop();
