@@ -8,6 +8,7 @@
 
 // PIN Configurations
 #define UI_LCD_SLAVE_SELECT_PIN 10
+#define UI_LCD_BACKLIGHT_PIN 7
 #define UI_BLUE_BUTTON_LED_PIN A1
 #define UI_RED_BUTTON_LED_PIN A0
 #define UI_BLUE_BUTTON_SWI_PIN 2
@@ -43,6 +44,8 @@ char ui_page_buffer[PAGE_SIZE];
 void ui_initialize()
 {
   //initialize LCD
+  pinMode(UI_LCD_BACKLIGHT_PIN, OUTPUT);
+  digitalWrite(UI_LCD_BACKLIGHT_PIN, HIGH);
 
   pinMode(UI_LCD_SLAVE_SELECT_PIN, OUTPUT);
   ui_lcd.begin(16, 2);
@@ -239,6 +242,13 @@ void ui_loopLED()
   }
 
 
+  if(pub_power_state != POWER_MODE_NORMAL)
+  {
+    delay(5);
+    digitalWrite(UI_BLUE_BUTTON_LED_PIN, LOW);  
+    digitalWrite(UI_RED_BUTTON_LED_PIN, LOW);  
+  }
+   
 }
 
 /*
@@ -247,6 +257,18 @@ void ui_loopLED()
  */
 void ui_loopLCD()
 {
+   //if power save mode, turn off
+   if(pub_power_state == POWER_MODE_NORMAL)
+   {
+     digitalWrite(UI_LCD_BACKLIGHT_PIN, HIGH);
+   }
+   else
+   {
+     digitalWrite(UI_LCD_BACKLIGHT_PIN, LOW); 
+     ui_lcd.clear();
+     return;
+   }
+   
    //display correct page
    if(ui_lcdCurrentPage >= PAGE_MEMORY_COUNT || ui_lcdCurrentPage < 0)
    {
@@ -387,6 +409,7 @@ void ui_redButtonPressed()
   //else, set buttonstate to pressed
   ui_redButtonState = 1;
   ui_redButtonLastPressed = millis();
+  pub_lastUserInput = ui_redButtonLastPressed;
   
 }
 
@@ -435,8 +458,7 @@ void ui_blueButtonPressed()
   //else, set buttonstate to pressed
   ui_blueButtonState = 1;
   ui_blueButtonLastPressed = millis();
+  pub_lastUserInput = ui_blueButtonLastPressed;
  
 }
-
-
 

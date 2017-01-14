@@ -3,17 +3,27 @@
 /*********************************************************************/
 /*  Public Variables available to all modules                        */
 /*********************************************************************/
-                         
-long  pub_currentTimeStamp = 0; //seconds since 2014-01-01
+                 
+// set by clock        
+unsigned long  pub_currentTimeStamp = 0; //seconds since 2014-01-01
 
+// set by sensor 
 byte  pub_sensor_data_valid = 0; //all pub_sensor variables is only to be used if this flag is set!
 byte  pub_sensor_addresses[80];  //10 addresses * 8 bytes each (hardware addresses of the temp. sensors)
 byte  pub_sensor_changed = 0;    //if since last loop any sensor config changed, this is set
 byte  pub_sensor_count = 0;      //count of sensors (indicates number of valid pub_sensor_data and pub_sensor_addresses)
 float pub_sensor_data[10];       //Holds sensor temperatures
 
+// set by UI
+unsigned long pub_lastUserInput = 0;
+
+// set by pwrmgmt
+float pub_vbat;
+byte pub_power_state = POWER_MODE_NORMAL; // 0 = everything normal, 1 = power save mode, 254 = low battery emergency off.
+
 
 byte pub_temp_cache[20];         //shared cache for various usages
+
 
 
 
@@ -150,6 +160,7 @@ void convertToChar(char* buffer, byte numDigits, long number, long maxExpected)
  */
 void convertFloatToChar(char *res, byte numDigits, float n, byte afterpoint)
 {
+   
    
     //if number is negative, decrease number of total digits by one
     //and if possible after point digits as well

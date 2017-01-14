@@ -43,6 +43,11 @@ int clock_test()
   }
 }
 
+boolean clock_settime()
+{
+  return RTC.set(1484301369l);
+}
+
 /* Periodical reads clock and  
  * updates clock page
  */
