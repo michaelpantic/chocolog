@@ -1,4 +1,3 @@
-#include <MemoryFree.h>
 #include <Time.h>
 #include<SdFat.h>
 #include <avr/pgmspace.h>
@@ -7,6 +6,8 @@
 /*********************************************************************/
 /*                       Definitions                                 */
 /*********************************************************************/
+
+
 
 #define DATE_DELIMITER '-'
 #define TIME_DELIMITER ':'
@@ -34,7 +35,10 @@
 #define POWER_MODE_NORMAL 0
 #define POWER_MODE_SAVE 1
 #define POWER_MODE_SHUTDOWN 254
-  
+
+typedef unsigned char PROGMEM   prog_uchar;
+typedef uint16_t PROGMEM   prog_uint16_t;
+
 void startup_error(const __FlashStringHelper* message)
 {
   

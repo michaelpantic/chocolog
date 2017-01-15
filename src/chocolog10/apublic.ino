@@ -1,5 +1,4 @@
 
-
 /*********************************************************************/
 /*  Public Variables available to all modules                        */
 /*********************************************************************/
@@ -20,7 +19,7 @@ unsigned long pub_lastUserInput = 0;
 // set by pwrmgmt
 float pub_vbat;
 byte pub_power_state = POWER_MODE_NORMAL; // 0 = everything normal, 1 = power save mode, 254 = low battery emergency off.
-
+byte pub_serial; // set by storage
 
 byte pub_temp_cache[20];         //shared cache for various usages
 

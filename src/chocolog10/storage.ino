@@ -1,8 +1,8 @@
-
 #define STORAGE_SS 8                    //Chip select for SD Card (PIN 8 here)
 #define STORAGE_DELIMITER '\t'          //column delimiter used in storage
 #define STORAGE_STRING_ESCAPE '"'       //used to encapsulate strings
 #define STORAGE_EEPROM_ADDR      0      //Address in EEPROM to store current recrod mode (uses 2 bytes)
+#define STORAGE_EEPROM_ADDR_SERIAL      1023      //Address in EEPROM to store serial number (uses 1 bytes)
 #define STORAGE_USB_LOG_INTERVAL 30000L //USB Log Interval in milliseconds
 
 
@@ -22,6 +22,7 @@ const prog_uchar storage_usb_disa[] PROGMEM =   "Dis";
 const prog_uchar storage_usb_off[] PROGMEM =    "OFF";
 const prog_uchar storage_usb_on[] PROGMEM =     "ON";
 const prog_uchar storage_usb_upload[] PROGMEM = "UPLOAD";
+
 byte storage_usb_subPage = 0;
 unsigned long storage_usb_subPageLastChanged = 0;
 SdFile entry; //file for directory listing/scroll
@@ -39,7 +40,6 @@ unsigned long storage_lastWritten = 0;
                             //123456789012
 char* storage_logFileName = " No File    "; //should be 12 chars long (8.3 file format)
 const prog_uchar storage_logFileExtension[] PROGMEM = ".txt";
-const char storage_logFileBeginning[]  = "L_";
 
 //data needed for data logging to USB
 unsigned long storage_usbLastLogged = 0;
@@ -221,6 +221,9 @@ void storage_writeConfigEEPROM()
 void storage_readConfigEEPROM()
 {
 
+  // read serial number
+  pub_serial = EEPROM.read(STORAGE_EEPROM_ADDR_SERIAL);
+
   storage_intervalMinutes = 0;
   byte val = EEPROM.read(STORAGE_EEPROM_ADDR);
 
@@ -276,8 +279,9 @@ void storage_writeInterval(char* buffer, int minutes)
  * Creates a new file Name in the 8.3 format.
  * Following schema applies:
  *  12345678
- *  l_YYMMDD.txt
- *  example: A file create on the 2014-10-01 14:20:00 = 10011420.txt
+ *  YYMMDDSS.txt
+ *  SS = logger serial
+ *  example: A file create on the 2014-10-01 on logger 01 = 14100101.txt
  */
 void storage_updateFileName()
 {
@@ -285,10 +289,12 @@ void storage_updateFileName()
   char* buffer = (char*)pub_getBuffer();                   // 0123456789012345678
   pub_convertTimeToChar(buffer, pub_currentTimeStamp); // format: YYYY-MM-DD HH:MM:SS
 
-  memcpy(storage_logFileName, storage_logFileBeginning, sizeof(char)*2); //file preamble
-  memcpy(storage_logFileName+2, buffer+2 ,sizeof(char)*2); //YY
-  memcpy(storage_logFileName+4, buffer+5 ,sizeof(char)*2); //MM
-  memcpy(storage_logFileName+6, buffer+8 ,sizeof(char)*2); //DD
+
+  memcpy(storage_logFileName, buffer+2 ,sizeof(char)*2); //YY
+  memcpy(storage_logFileName+2, buffer+5 ,sizeof(char)*2); //MM
+  memcpy(storage_logFileName+4, buffer+8 ,sizeof(char)*2); //DD
+  convertToChar(storage_logFileName+6, 2, pub_serial, 99);
+  
   memcpy_P(storage_logFileName+8, storage_logFileExtension, sizeof(char)*4); //file extension
 }
 
@@ -460,9 +466,7 @@ byte storage_sdEntryAdvance()
 
    }
    while(entry.isOpen() && 
-                     (entry.isDir() || 
-                     cache[0] != storage_logFileBeginning[0] || 
-                     cache[1] != storage_logFileBeginning[1])
+                     (entry.isDir())
           );
      
      //no file found - end of dir reached

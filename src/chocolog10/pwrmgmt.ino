@@ -13,6 +13,7 @@
 
 
 const prog_uchar  vbatHeader[] PROGMEM =       "VBAT=";
+const prog_uchar  serHeader[] PROGMEM =       "S/N=";
 unsigned long vbat_last_read = 0;
 
 /* Initialize diag module
@@ -97,12 +98,13 @@ void pwrmgmt_loop()
     
    // write number of millis since last loop
    convertFloatToChar(page+5, 4, pub_vbat, 2);
+
+   memcpy_P(page+16, serHeader, 5);
+   convertToChar(page+20, 2, pub_serial, 99);
   }
 }
 
 boolean pwrmgmt_save_power()
 {
-    Serial.println("B");
-    Serial.println(pub_power_state);
     return pub_power_state == POWER_MODE_SAVE;
 }
