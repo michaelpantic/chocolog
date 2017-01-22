@@ -10,7 +10,7 @@
 
 /** the current address in the EEPROM (i.e. which byte we're going to write to next) **/
 int addr = 1023;
-int serialNumber = 4;
+int serialNumber = 7;
 void setup() {
   Serial.begin(9600);
    Serial.println("Type w to start");
