@@ -45,7 +45,7 @@ int clock_test()
 
 boolean clock_settime()
 {
-  return RTC.set(1484301369l);
+  return RTC.set(1486072842l);
 }
 
 /* Periodical reads clock and  
@@ -53,6 +53,7 @@ boolean clock_settime()
  */
 void clock_loop()
 {
+
   //get time from rtc
   time_t currTime = RTC.get();
   if(currTime == 0) return; //no data

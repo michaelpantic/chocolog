@@ -87,7 +87,6 @@ void setup()
   sensor_initialize();
  
   ui_hw_test();
-   
   switch(clock_test())
   {
     case 0: break; //everything ok
