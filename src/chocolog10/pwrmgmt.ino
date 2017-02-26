@@ -8,7 +8,7 @@
 
 #define PWRMGMT_BAT_SAVE_TIME 15000 // [ms]
 #define PWRMGMT_BAT_SAVE_ON 4.00 //volts - below this voltage, power save mode is triggered
-#define PWRMGMT_BAT_SAVE_OFF 4.05 //volts - above this voltage, power save mode is turned off
+#define PWRMGMT_BAT_SAVE_OFF 4.15 //volts - above this voltage, power save mode is turned off
 #define PWRMGMT_BAT_LOW 3.25 //volts - below this voltage, the logger shuts itself down!
 
 

@@ -1,8 +1,17 @@
+#define SDA_PORT PORTC
+#define SDA_PIN 4
+#define SCL_PORT PORTC
+#define SCL_PIN 5
+#define I2C_TIMEOUT 500
+
+#include <SoftWire.h>
+#include <SoftI2CMaster.h>
 #include <Time.h>
 #include<SdFat.h>
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
 #include "LowPower.h"
+
 /*********************************************************************/
 /*                       Definitions                                 */
 /*********************************************************************/
@@ -81,7 +90,7 @@ void setup()
   ui_initialize();
   data_initialize();
   clock_initialize();
-
+  humid_init();
   
   storage_initialize();
   sensor_initialize();
@@ -135,6 +144,8 @@ void loop()
   //update storage and serial
   storage_loop();
   
+  humid_loop();
+  
   //update data display page
   data_loop();
   
@@ -144,6 +155,7 @@ void loop()
   //update LCD / Buttons
   ui_outputLoop(); 
   
+
 
   if(pwrmgmt_save_power())
   {
