@@ -1,13 +1,22 @@
 #define HUMID_IDLE 0
 #define HUMID_MEASURING 1
-#define HUMID_INTERVAL 120000 //once every 2 minute
+#define HUMID_INTERVAL 2000 //once every 2 minute
+SoftWire SWire = SoftWire();
 
 int mode;
-unsigned long humdity_last_read = 0;
+unsigned long humdity_last_read = 999999999;
+uint8_t _i2caddr = 0x44;
 
 void humid_init(){
-  i2c_init();
+  
+   // Do softreset 
+  SWire.beginTransmission(_i2caddr);
+  SWire.write(SHT31_SOFTRESET >> 8);
+  SWire.write(SHT31_SOFTRESET & 0xFF);
+  SWire.endTransmission();  
+
   mode = HUMID_IDLE;
+  pub_humidity=00.22;
 
 }
 
@@ -15,29 +24,51 @@ void humid_loop(){
   if(mode == HUMID_IDLE && 
   pub_intervalElapsed(humdity_last_read, HUMID_INTERVAL)
     ){
-    //single shot high repeatablity without clock stretching
-    byte cmd_lsb = 0x00;
-    byte cmd_msb = 0x24;
-  
-    i2c_start(0x44 | I2C_WRITE);
-    i2c_write(cmd_msb);
-    i2c_write(cmd_lsb);
-    mode = HUMID_MEASURING;
+   //Send measurement command
+SWire.beginTransmission(_i2caddr);
+ SWire.write(SHT31_MEAS_HIGHREP >> 8);
+  SWire.write(SHT31_MEAS_HIGHREP & 0xFF);
+  SWire.endTransmission();  
     humdity_last_read = millis();
+    
+        mode = HUMID_MEASURING;
+        pub_humidity=11.11;
   }
   else if(mode == HUMID_MEASURING){
-    if(!i2c_start(0x44 | I2C_READ)){
-      return; //no data yet
-    }
-    i2c_read(false); //ignore tmp MSB
-    i2c_read(false); //ignore tmp LSB
-    i2c_read(false); //ignore tmp CRC
-    byte humid_msb = i2c_read(false);
-    byte humid_lsb = i2c_read(false);
-    byte humid_crc = i2c_read(true);
-    pub_humidity = 100 * (float)(humid_msb<<8 & humid_lsb)/65535; 
-    i2c_stop();
-    mode == HUMID_IDLE;
+    //  delay(500);
+
+    uint8_t readbuffer[6];
+   //read 6 bytes
+SWire.requestFrom(_i2caddr, (uint8_t)6);
+  
+  for (uint8_t i=0; i<6; i++) {
+    readbuffer[i] = SWire.read();
+  //  Serial.print("0x"); Serial.println(readbuffer[i], HEX);
+  }
+  
+  //convert temp
+  uint16_t ST, SRH;
+  ST = readbuffer[0];
+  ST <<= 8;
+  ST |= readbuffer[1];
+  
+   SRH = readbuffer[3];
+  SRH <<= 8;
+  SRH |= readbuffer[4];
+
+  
+    double stemp = ST;
+   stemp *= 175;
+ 	  stemp /= 0xffff;
+	  stemp = -45 + stemp;
+   
+     double shum = SRH;
+  shum *= 100;
+  shum /= 0xFFFF;
+  
+
+    mode = HUMID_IDLE;
+    pub_humidity = shum;
   }
 
 }

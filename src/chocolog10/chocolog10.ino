@@ -1,11 +1,24 @@
-#define SDA_PORT PORTC
-#define SDA_PIN 4
-#define SCL_PORT PORTC
-#define SCL_PIN 5
-#define I2C_TIMEOUT 500
+#define SDA_PORT PORTD
+#define SDA_PIN 0
+#define SCL_PORT PORTD
+#define SCL_PIN 1
+#define I2C_TIMEOUT 100
+#define I2C_FASTMODE 1
 
 #include <SoftWire.h>
-#include <SoftI2CMaster.h>
+#define SHT31_DEFAULT_ADDR    0x44
+#define SHT31_MEAS_HIGHREP_STRETCH 0x2C06
+#define SHT31_MEAS_MEDREP_STRETCH  0x2C0D
+#define SHT31_MEAS_LOWREP_STRETCH  0x2C10
+#define SHT31_MEAS_HIGHREP         0x2400
+#define SHT31_MEAS_MEDREP          0x240B
+#define SHT31_MEAS_LOWREP          0x2416
+#define SHT31_READSTATUS           0xF32D
+#define SHT31_CLEARSTATUS          0x3041
+#define SHT31_SOFTRESET            0x30A2
+#define SHT31_HEATEREN             0x306D
+#define SHT31_HEATERDIS            0x3066
+
 #include <Time.h>
 #include<SdFat.h>
 #include <avr/pgmspace.h>
@@ -84,7 +97,7 @@ void setup()
   pinMode(10, OUTPUT);    
 
 
-  Serial.begin(115200);
+//  Serial.begin(115200);
   delay(500);
   pwrmgmt_initialize();
   ui_initialize();
@@ -158,8 +171,8 @@ void loop()
   
 
 
-  if(pwrmgmt_save_power())
+ /* if(pwrmgmt_save_power())
   {
-    power_save();
-  }
+  //  power_save();
+  }*/
 }

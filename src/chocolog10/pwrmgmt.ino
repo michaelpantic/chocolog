@@ -12,7 +12,7 @@
 #define PWRMGMT_BAT_LOW 3.25 //volts - below this voltage, the logger shuts itself down!
 
 
-const prog_uchar  vbatHeader[] PROGMEM =       "VBAT=";
+const prog_uchar  vbatHeader[] PROGMEM =       "% RH=";
 const prog_uchar  serHeader[] PROGMEM =       "S/N=";
 unsigned long vbat_last_read = 0;
 
@@ -86,7 +86,7 @@ void pwrmgmt_loop()
   pwrmgmt_read_vbat();
   
   // update power mgmt of device
-  pwrmgmt_update_mode();
+ // pwrmgmt_update_mode();
   
   // update status page if necessary
   char* page = pub_getEmptyPage(DIAG_PAGE);
@@ -97,7 +97,7 @@ void pwrmgmt_loop()
    memcpy_P(page, vbatHeader, 5);
     
    // write number of millis since last loop
-   convertFloatToChar(page+5, 4, pub_vbat, 2);
+   convertFloatToChar(page+5, 6, pub_humidity, 3);
 
    memcpy_P(page+16, serHeader, 5);
    convertToChar(page+20, 2, pub_serial, 99);
