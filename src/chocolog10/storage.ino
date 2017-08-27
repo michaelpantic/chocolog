@@ -316,6 +316,10 @@ void storage_writeHeader(Print* s)
   s->print(STORAGE_STRING_ESCAPE);
   s->print("Realtime");
   s->print(STORAGE_STRING_ESCAPE);
+  s->print(STORAGE_DELIMITER);
+  s->print(STORAGE_STRING_ESCAPE);
+  s->print("RH");
+  s->print(STORAGE_STRING_ESCAPE);
 
 
   //write sensor headers
@@ -358,6 +362,8 @@ void storage_writeEntry(Print* s)
   s->print(STORAGE_STRING_ESCAPE);
   s->print(buffer);
   s->print(STORAGE_STRING_ESCAPE);
+  s->print(STORAGE_DELIMITER);
+  s->print(pub_humidity);
 
   //Sensor data
   for(int i=0;i<pub_sensor_count;i++)

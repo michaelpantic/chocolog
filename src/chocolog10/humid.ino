@@ -1,11 +1,40 @@
 #define HUMID_IDLE 0
 #define HUMID_MEASURING 1
-#define HUMID_INTERVAL 2000 //once every 2 minute
+#define HUMID_INTERVAL 60000 //once every minute
 SoftWire SWire = SoftWire();
 
 int mode;
-unsigned long humdity_last_read = 999999999;
+unsigned long humdity_last_read = 0;
 uint8_t _i2caddr = 0x44;
+
+uint8_t crc8(const uint8_t *data, int len)
+{
+/*
+*
+ * CRC-8 formula from page 14 of SHT spec pdf
+ *
+ * Test data 0xBE, 0xEF should yield 0x92
+ *
+ * Initialization data 0xFF
+ * Polynomial 0x31 (x8 + x5 +x4 +1)
+ * Final XOR 0x00
+ */
+
+  const uint8_t POLYNOMIAL(0x31);
+  uint8_t crc(0xFF);
+
+  for ( int j = len; j; --j ) {
+      crc ^= *data++;
+
+      for ( int i = 8; i; --i ) {
+	crc = ( crc & 0x80 )
+	  ? (crc << 1) ^ POLYNOMIAL
+	  : (crc << 1);
+      }
+  }
+  return crc;
+}
+
 
 void humid_init(){
   
@@ -14,10 +43,7 @@ void humid_init(){
   SWire.write(SHT31_SOFTRESET >> 8);
   SWire.write(SHT31_SOFTRESET & 0xFF);
   SWire.endTransmission();  
-
   mode = HUMID_IDLE;
-  pub_humidity=00.22;
-
 }
 
 void humid_loop(){
@@ -32,7 +58,7 @@ SWire.beginTransmission(_i2caddr);
     humdity_last_read = millis();
     
         mode = HUMID_MEASURING;
-        pub_humidity=11.11;
+
   }
   else if(mode == HUMID_MEASURING){
     //  delay(500);
@@ -69,6 +95,13 @@ SWire.requestFrom(_i2caddr, (uint8_t)6);
 
     mode = HUMID_IDLE;
     pub_humidity = shum;
+    
+       if(readbuffer[2] == crc8(readbuffer, 2)){
+           pub_humidity = shum;
+       }else{
+           pub_humidity = -1.00;
+       }
+
   }
 
 }
