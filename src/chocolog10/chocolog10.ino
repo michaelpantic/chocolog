@@ -170,8 +170,8 @@ void loop()
   
 
 
- /* if(pwrmgmt_save_power())
+  if(pwrmgmt_save_power())
   {
-  //  power_save();
-  }*/
+    power_save();
+  }
 }

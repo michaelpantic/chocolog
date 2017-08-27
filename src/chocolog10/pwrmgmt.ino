@@ -7,12 +7,15 @@
 #define PWRMGMT_BAT_MON_INTERVAL 5000
 
 #define PWRMGMT_BAT_SAVE_TIME 15000 // [ms]
-#define PWRMGMT_BAT_SAVE_ON 4.00 //volts - below this voltage, power save mode is triggered
+#define PWRMGMT_BAT_SAVE_ON 4.05 //volts - below this voltage, power save mode is triggered
 #define PWRMGMT_BAT_SAVE_OFF 4.15 //volts - above this voltage, power save mode is turned off
 #define PWRMGMT_BAT_LOW 3.25 //volts - below this voltage, the logger shuts itself down!
+#define PWRMGMT_BAT_NOBAT 2.5 //volts - below this voltage, the logger decides that no battery is attached
 
 
-const prog_uchar  vbatHeader[] PROGMEM =       "% RH=";
+
+const prog_uchar  RHHeader[] PROGMEM =       "% RH=";
+const prog_uchar  vbatHeader[] PROGMEM =       "BAT=";
 const prog_uchar  serHeader[] PROGMEM =       "S/N=";
 unsigned long vbat_last_read = 0;
 
@@ -44,7 +47,7 @@ void pwrmgmt_read_vbat()
 void pwrmgmt_update_mode()
 { 
     // CAUTION! Setting mode_shutdown disables any user input, device has to be reset!
-    if(pub_vbat < PWRMGMT_BAT_LOW)
+    if(pub_vbat < PWRMGMT_BAT_LOW && pub_vbat > PWRMGMT_BAT_NOBAT)
     {
       pub_power_state = POWER_MODE_SHUTDOWN;  
       return;
@@ -86,7 +89,7 @@ void pwrmgmt_loop()
   pwrmgmt_read_vbat();
   
   // update power mgmt of device
- // pwrmgmt_update_mode();
+  pwrmgmt_update_mode();
   
   // update status page if necessary
   char* page = pub_getEmptyPage(DIAG_PAGE);
@@ -94,13 +97,15 @@ void pwrmgmt_loop()
   if(page) 
   {
    // write header from Progmem to page
-   memcpy_P(page, vbatHeader, 5);
+   memcpy_P(page, RHHeader, 5);
     
-   // write number of millis since last loop
-   convertFloatToChar(page+5, 6, pub_humidity, 3);
+   convertFloatToChar(page+5, 5, pub_humidity, 2);
 
    memcpy_P(page+16, serHeader, 5);
    convertToChar(page+20, 2, pub_serial, 99);
+   
+   memcpy_P(page+24, vbatHeader, 4);
+   convertFloatToChar(page+28,4,pub_vbat,2);
   }
 }
 

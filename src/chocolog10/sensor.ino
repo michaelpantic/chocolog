@@ -17,7 +17,7 @@
 // Sensor Constants
 #define SENSOR_BUS_PIN 4          //1 Wire Bus Pin
 #define SENSOR_CONVERT_TIME 1000  // Time a sensor needs to digitalize temperature (750ms according to datasheet..better use 1000ms)
-#define SENSOR_READ_INTERVAL 500  // How often sensors are re-read
+#define SENSOR_READ_INTERVAL 10000  // How often sensors are re-read
 #define SENSOR_CMD_CONVERT 0x44   // Command to start temperature digitalization
 #define SENSOR_CMD_READ    0xBE   // Command to read sensor memory with temperature
 
