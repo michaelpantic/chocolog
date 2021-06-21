@@ -96,7 +96,7 @@ void ui_hw_test()
   
   delay(500);
   
-  ui_lcd.clear();
+  //ui_lcd.clear();
  
   digitalWrite(UI_RED_BUTTON_LED_PIN, LOW);
   digitalWrite(UI_BLUE_BUTTON_LED_PIN, LOW);
@@ -461,4 +461,3 @@ void ui_blueButtonPressed()
   pub_lastUserInput = ui_blueButtonLastPressed;
  
 }
-

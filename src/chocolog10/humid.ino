@@ -1,6 +1,6 @@
 #define HUMID_IDLE 0
 #define HUMID_MEASURING 1
-#define HUMID_INTERVAL 60000 //once every minute
+#define HUMID_INTERVAL 30000 //once every 30s
 SoftWire SWire = SoftWire();
 
 int mode;
@@ -86,7 +86,7 @@ void humid_loop(){
      if(readbuffer[2] == crc8(readbuffer, 2)){
          pub_humidity = shum;
      }else{
-         pub_humidity = -1.00;
+         pub_humidity = -99.0;
      }
 
   }

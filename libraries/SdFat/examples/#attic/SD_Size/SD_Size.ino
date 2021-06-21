@@ -1,6 +1,6 @@
 /*
- * Sketch to compare size of Arduino SD library with SdFat V2.
- * See SdFatSize.pde for SdFat sketch.
+ * Program to compare size of Arduino SD library with SdFat.
+ * See SdFatSize.ino for SdFat program.
  */
 #include <SPI.h>
 #include <SD.h>
@@ -9,7 +9,11 @@ File file;
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  while (!Serial) {}  // wait for Leonardo
+  
+  // Wait for USB Serial 
+  while (!Serial) {
+    yield();
+  }
 
   if (!SD.begin()) {
     Serial.println("begin failed");

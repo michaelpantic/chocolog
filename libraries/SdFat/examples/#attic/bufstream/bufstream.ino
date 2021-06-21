@@ -1,7 +1,9 @@
 /*
  * Use of ibufsteam to parse a line and obufstream to format a line
  */
-#include <SdFat.h>
+#include <SPI.h>
+#include "SdFat.h"
+#include "sdios.h"
 
 // create a serial output stream
 ArduinoOutStream cout(Serial);
@@ -11,9 +13,13 @@ void setup() {
   int i, j, k;    // values from parsed line
 
   Serial.begin(9600);
-  while (!Serial) {}  // wait for Leonardo
-  delay(2000);
   
+  // Wait for USB Serial 
+  while (!Serial) {
+    SysCall::yield();
+  }
+  delay(2000);
+
   // initialize input string
   ibufstream bin("123 456 789");
 

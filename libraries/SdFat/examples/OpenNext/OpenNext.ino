@@ -1,31 +1,47 @@
 /*
  * Print size, modify date/time, and name for all files in root.
  */
-#include <SdFat.h>
+#include <SPI.h>
+#include "SdFat.h"
 
-// SD chip select pin
+// SD default chip select pin.
 const uint8_t chipSelect = SS;
 
 // file system object
 SdFat sd;
 
+SdFile root;
 SdFile file;
 //------------------------------------------------------------------------------
 void setup() {
   Serial.begin(9600);
-  while (!Serial) {} // wait for Leonardo
-  delay(1000);
   
-  // initialize the SD card at SPI_HALF_SPEED to avoid bus errors with
-  // breadboards.  use SPI_FULL_SPEED for better performance.
-  if (!sd.begin(chipSelect, SPI_HALF_SPEED)) sd.initErrorHalt();
+  // Wait for USB Serial 
+  while (!Serial) {
+    SysCall::yield();
+  }
+  
+  Serial.println("Type any character to start");
+  while (!Serial.available()) {
+    SysCall::yield();
+  }
 
-  // open next file in root.  The volume working directory, vwd, is root
-  while (file.openNext(sd.vwd(), O_READ)) {
+  // Initialize at the highest speed supported by the board that is
+  // not over 50 MHz. Try a lower speed if SPI errors occur.
+  if (!sd.begin(chipSelect, SD_SCK_MHZ(50))) {
+    sd.initErrorHalt();
+  }
+  if (!root.open("/")) {
+    sd.errorHalt("open root failed");
+  }
+  // Open next file in root.
+  // Warning, openNext starts at the current directory position
+  // so a rewind of the directory may be required.
+  while (file.openNext(&root, O_RDONLY)) {
     file.printFileSize(&Serial);
     Serial.write(' ');
     file.printModifyDateTime(&Serial);
-    Serial.write(' ');    
+    Serial.write(' ');
     file.printName(&Serial);
     if (file.isDir()) {
       // Indicate a directory.
@@ -34,7 +50,11 @@ void setup() {
     Serial.println();
     file.close();
   }
-  Serial.println("Done!");
+  if (root.getError()) {
+    Serial.println("openNext failed");
+  } else {
+    Serial.println("Done!");
+  }
 }
 //------------------------------------------------------------------------------
 void loop() {}

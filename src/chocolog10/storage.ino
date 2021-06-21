@@ -145,7 +145,7 @@ void storage_loopSD()
   //if enough time elapsed since last written
   if(storage_lastWritten-(storage_lastWritten%intervalSeconds)+intervalSeconds <= pub_currentTimeStamp) //we don't need to use the pub_intervalElapsed funciton here, since we use seconds and not millis (no rollover)
   {
-    storage_logFile.writeError = 0;
+    storage_logFile.clearWriteError();
     //if no header has been written yet (first entry, write new header)
     if(storage_lastWritten == 0)
     {
@@ -155,7 +155,7 @@ void storage_loopSD()
     //write entry
     storage_writeEntry(&storage_logFile);
     
-    if(storage_logFile.writeError == 1)
+    if(storage_logFile.getWriteError() == 1)
     {
        ui_setBlueLED(UI_BLINK); 
     }
@@ -468,7 +468,7 @@ byte storage_sdEntryAdvance()
    {
     if(entry.isOpen()) entry.close();
     entry.openNext(sd.vwd(),O_READ);
-    if(entry.isOpen()) entry.getFilename(cache);
+    if(entry.isOpen()) entry.getName(cache, 12);
 
    }
    while(entry.isOpen() && 
@@ -566,7 +566,7 @@ void storage_updateUSBPage()
     if(!entry.isOpen()) return; //no file ot display
     
     char* buffer = (char*)pub_getBuffer();
-    entry.getFilename(buffer); //writes the name (12 chars into the buffer)
+    entry.getName(buffer, 12); //writes the name (12 chars into the buffer)
     byte len = strlen(buffer);
     memcpy(page+16,buffer,len);
     
@@ -595,7 +595,7 @@ void storage_transmitFile(SdFile* f, char* pageBuffer)
 {
   //get temporary storage
   char* cache = (char*)pub_getBuffer();
-  entry.getFilename(cache); //writes
+  entry.getName(cache, 12); //writes
     
     
   //clear pagebuffer
@@ -666,4 +666,3 @@ void storage_transmitFile(SdFile* f, char* pageBuffer)
   ui_clearAlert();
      
 }
-

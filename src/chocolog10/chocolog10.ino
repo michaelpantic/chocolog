@@ -1,7 +1,7 @@
 #define SDA_PORT PORTD
-#define SDA_PIN 0
+#define SDA_PIN 1
 #define SCL_PORT PORTD
-#define SCL_PIN 1
+#define SCL_PIN 0
 #define I2C_TIMEOUT 100
 #define I2C_FASTMODE 1
 
@@ -28,8 +28,6 @@
 /*********************************************************************/
 /*                       Definitions                                 */
 /*********************************************************************/
-
-
 
 #define DATE_DELIMITER '-'
 #define TIME_DELIMITER ':'
@@ -97,7 +95,7 @@ void setup()
   pinMode(10, OUTPUT);    
 
 
-//  Serial.begin(115200);
+  //Serial.begin(115200);
   delay(500);
   pwrmgmt_initialize();
   ui_initialize();
@@ -136,7 +134,6 @@ void setup()
   }
   
   sensor_test();
-
 }
 
 
